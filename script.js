@@ -2,6 +2,23 @@ $(function () {
     loadRecipies();
 
     $("#recipes").on("click", ".btn-danger", handleDelete);
+    $("#recipes").on("click", ".btn-warning", handleUpdate);
+  $("#addBtn").click(addRecipe);
+  $("#updateSave").click(function () {
+    var id = $("#updateId").val();
+    var title = $("#updateTitle").val();
+    var body = $("#updateBody").val();
+    $.ajax({
+      url: "https://usman-fake-api.herokuapp.com/api/recipes/" + id,
+      data: { title, body },
+      method: "PUT",
+      success: function (response) {
+        console.log(response);
+        loadRecipies();
+        $("#updateModal").modal("hide");
+      },
+    });
+  });
 });
 
 function loadRecipies() {
@@ -36,6 +53,38 @@ function loadRecipies() {
       method: "DELETE",
       success: function () {
         loadRecipies();
+      },
+    });
+  }
+
+  function handleUpdate() {
+    var btn = $(this);
+    var parentDiv = btn.closest(".recipe");
+    let id = parentDiv.attr("data-id");
+    $.get(
+      "https://usman-fake-api.herokuapp.com/api/recipes/" + id,
+      function (response) {
+        $("#updateId").val(response._id);
+        $("#updateTitle").val(response.title);
+        $("#updateBody").val(response.body);
+        $("#updateModal").modal("show");
+      }
+    );
+  }
+
+  function addRecipe() {
+    var title = $("#title").val();
+    var body = $("#body").val();
+    $.ajax({
+      url: "https://usman-fake-api.herokuapp.com/api/recipes",
+      method: "POST",
+      data: { title, body },
+      success: function (response) {
+        console.log(response);
+        $("#title").val("");
+        $("#body").val("");
+        loadRecipies();
+        $("#addModal").modal("hide");
       },
     });
   }
